@@ -4,7 +4,9 @@ RUN rustup default stable
 
 RUN apt-get update && apt-get install -y libclang-dev
 
-COPY . /sources
+COPY Cargo.lock Cargo.toml /sources/
+COPY ./src/ /sources/src/
+
 WORKDIR /sources
 RUN cargo build --release
 RUN chown nobody:nogroup /sources/target/release/faas
@@ -16,4 +18,5 @@ COPY --from=builder /sources/target/release/faas /opt/faas
 
 USER nobody
 EXPOSE 8000
+WORKDIR /opt
 ENTRYPOINT ["/opt/faas"]
