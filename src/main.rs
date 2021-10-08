@@ -47,7 +47,7 @@ impl Fortunes {
 
 #[launch]
 fn rocket() -> _ {
-    let fortunes = Fortunes::load("fortunes/fortunes").expect("Could not load fortune file");
+    let fortunes = Fortunes::load("fortunes").expect("Could not load fortune file");
     rocket::build()
         .manage(fortunes)
         .mount("/", routes![shuffle, specific])

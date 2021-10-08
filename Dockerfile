@@ -13,7 +13,7 @@ RUN chown nobody:nogroup /sources/target/release/faas
 
 
 FROM debian:stretch-slim
-COPY ./fortunes/fortunes /opt/fortunes/fortunes
+COPY fortunes /opt/fortunes
 COPY --from=builder /sources/target/release/faas /opt/faas
 
 USER nobody
