@@ -28,7 +28,7 @@ impl Fortunes {
         f.read_to_string(&mut str)?;
         Ok(Fortunes {
             fortunes: str
-                .split('%')
+                .split("\n%\n")
                 .map(|x| x.trim())
                 .map(|x| x.to_string())
                 .collect::<Vec<String>>(),
@@ -37,6 +37,10 @@ impl Fortunes {
 
     fn random(&self) -> &str {
         self.get(thread_rng().next_u32() as usize)
+    }
+
+    fn len(&self) -> usize {
+        return self.fortunes.len()
     }
 
     fn get(&self, index: usize) -> &str {
@@ -48,6 +52,7 @@ impl Fortunes {
 #[launch]
 fn rocket() -> _ {
     let fortunes = Fortunes::load("fortunes").expect("Could not load fortune file");
+    println!("Loaded {} fortunes", fortunes.len());
     rocket::build()
         .manage(fortunes)
         .mount("/", routes![shuffle, specific])
