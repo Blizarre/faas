@@ -40,7 +40,7 @@ impl Fortunes {
     }
 
     fn len(&self) -> usize {
-        return self.fortunes.len();
+        self.fortunes.len()
     }
 
     fn get(&self, index: usize) -> &str {
