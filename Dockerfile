@@ -16,6 +16,8 @@ FROM debian:stretch-slim
 COPY fortunes /opt/fortunes
 COPY --from=builder /sources/target/release/faas /opt/faas
 
+ENV ROCKET_FORTUNE_PATH=fortunes
+
 USER nobody
 EXPOSE 8000
 WORKDIR /opt
