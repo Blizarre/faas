@@ -1,23 +1,67 @@
 #[macro_use]
 extern crate rocket;
 
+use rocket::serde::Deserialize;
+use rocket::{fairing::AdHoc, State};
+
 use rand::prelude::{thread_rng, RngCore};
-use rocket::State;
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
+
+use rocket::response::content;
+
+#[derive(Deserialize)]
+struct AppConfig {
+    fortune_path: String,
+    url_prefix: String,
+}
 
 struct Fortunes {
     fortunes: Vec<String>,
 }
 
+fn template(id: usize, message: &str, url_prefix: &str) -> content::Html<String> {
+    content::Html(
+        "<!doctype html>
+<html lang=\"en\">
+    <head>
+        <title>Faas - {{id}}</title>
+    </head>
+    <body>
+        <pre>{{message}}</pre>
+        <a href=\"{{url_prefix}}{{id}}\">🔗</a>
+    </body>
+</html>"
+            .replace("{{id}}", &id.to_string())
+            .replace("{{message}}", message)
+            .replace("{{url_prefix}}", url_prefix),
+    )
+}
+
 #[get("/")]
-fn shuffle(fortunes: &State<Fortunes>) -> &str {
-    fortunes.random()
+fn shuffle(fortunes: &State<Fortunes>, config: &State<AppConfig>) -> content::Html<String> {
+    let (id, content) = fortunes.random();
+    template(id, content, &config.url_prefix)
 }
 
 #[get("/<id>")]
-fn specific(id: usize, fortunes: &State<Fortunes>) -> &str {
+fn specific(
+    id: usize,
+    fortunes: &State<Fortunes>,
+    config: &State<AppConfig>,
+) -> content::Html<String> {
+    template(id, fortunes.get(id), &config.url_prefix)
+}
+
+#[get("/txt")]
+fn shuffle_txt(fortunes: &State<Fortunes>) -> &str {
+    let (_, content) = fortunes.random();
+    content
+}
+
+#[get("/txt/<id>")]
+fn specific_txt(id: usize, fortunes: &State<Fortunes>) -> &str {
     fortunes.get(id)
 }
 
@@ -35,8 +79,9 @@ impl Fortunes {
         })
     }
 
-    fn random(&self) -> &str {
-        self.get(thread_rng().next_u32() as usize)
+    fn random(&self) -> (usize, &str) {
+        let id = thread_rng().next_u32() as usize;
+        (id, self.get(id))
     }
 
     fn len(&self) -> usize {
@@ -51,9 +96,13 @@ impl Fortunes {
 
 #[launch]
 fn rocket() -> _ {
-    let fortunes = Fortunes::load("fortunes").expect("Could not load fortune file");
+    let config = rocket::Config::figment()
+        .extract::<AppConfig>()
+        .expect("Could not read config");
+    let fortunes = Fortunes::load(&config.fortune_path).expect("Could not load fortune file");
     println!("Loaded {} fortunes", fortunes.len());
     rocket::build()
+        .attach(AdHoc::config::<AppConfig>())
         .manage(fortunes)
-        .mount("/", routes![shuffle, specific])
+        .mount("/", routes![shuffle, specific, shuffle_txt, specific_txt])
 }

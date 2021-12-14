@@ -7,11 +7,26 @@ _Fortune As A Service_
 https://faas.marache.net
 
 ```
-$ curl -s https://faas.marache.net
+$ curl -s https://faas.marache.net/txt/
 "Text processing has made it possible to right-justify any idea, even
 one which cannot be justified on any other grounds."
                 -- J. Finnegan, USC.⏎
 ```
+
+The service expose `/` and `/<id>` as html pages with a bottom link to the page itself, and `/txt` and `/txt/<id>` as pure `text/plain` endpoints.
+
+## Configuration
+
+- `fortune_path`: Location of the fortunes file
+- `url_prefix`: Url prefix used to generate the share links (`{{url_prefix}}/{{id}}`).
+
+example:
+
+```bash
+ROCKET_FORTUNE_PATH=../../fortunes ROCKET_URL_PREFIX=http://localhost:8000/ ./faas
+```
+
+Or use a [Rocket configuration file](https://rocket.rs/v0.5-rc/guide/configuration/#rockettoml).
 
 # Performance
 
