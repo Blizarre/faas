@@ -21,8 +21,8 @@ struct Fortunes {
     fortunes: Vec<String>,
 }
 
-fn template(id: usize, message: &str, url_prefix: &str) -> content::Html<String> {
-    content::Html(
+fn template(id: usize, message: &str, url_prefix: &str) -> content::RawHtml<String> {
+    content::RawHtml(
         "<!doctype html>
 <html lang=\"en\">
     <head>
@@ -40,7 +40,7 @@ fn template(id: usize, message: &str, url_prefix: &str) -> content::Html<String>
 }
 
 #[get("/")]
-fn shuffle(fortunes: &State<Fortunes>, config: &State<AppConfig>) -> content::Html<String> {
+fn shuffle(fortunes: &State<Fortunes>, config: &State<AppConfig>) -> content::RawHtml<String> {
     let (id, content) = fortunes.random();
     template(id, content, &config.url_prefix)
 }
@@ -50,7 +50,7 @@ fn specific(
     id: usize,
     fortunes: &State<Fortunes>,
     config: &State<AppConfig>,
-) -> content::Html<String> {
+) -> content::RawHtml<String> {
     template(id, fortunes.get(id), &config.url_prefix)
 }
 
