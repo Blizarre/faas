@@ -12,7 +12,7 @@ RUN cargo build --release
 RUN chown nobody:nogroup /sources/target/release/faas
 
 
-FROM debian:stretch-slim
+FROM debian:bullseye-slim
 COPY fortunes /opt/fortunes
 COPY --from=builder /sources/target/release/faas /opt/faas
 
