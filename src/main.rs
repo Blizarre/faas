@@ -4,7 +4,7 @@ extern crate rocket;
 use rocket::serde::Deserialize;
 use rocket::{fairing::AdHoc, State};
 
-use rand::prelude::{thread_rng, RngCore};
+use rand::prelude::{ThreadRng, RngCore};
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
@@ -80,7 +80,7 @@ impl Fortunes {
     }
 
     fn random(&self) -> (usize, &str) {
-        let id = thread_rng().next_u32() as usize;
+        let id = ThreadRng::default().next_u32() as usize;
         (id, self.get(id))
     }
 
