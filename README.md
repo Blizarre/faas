@@ -15,6 +15,7 @@ one which cannot be justified on any other grounds."
 
 The service expose `/` and `/<id>` as html pages with a bottom link to the page itself, and `/txt` and `/txt/<id>` as pure `text/plain` endpoints.
 
+The docker image is built using the official [Docker Hardened images](https://dhi.io/).
 ## Configuration
 
 - `fortune_path`: Location of the fortunes file
